@@ -2,7 +2,7 @@
 
 
 "use client"
-import { useState, useCallback } from "react"
+import { useState, useEffect, useCallback } from "react"
 import useOrders from "@/lib/useOrders"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -21,7 +21,7 @@ import DriverProfile from "./driver-profile"
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface Order {
   id: string
-  status: "pending" | "delivered" | "in_progress"
+  status: "pending" | "delivered" | "in_progress" | "done"
   name?: string
   email?: string
   phone?: string
@@ -215,7 +215,7 @@ function MobileOrderRow({
 }) {
   const [expanded, setExpanded] = useState(false)
   const priority = (order.optimized_sequence ?? index) + 1
-  const isDelivered = order.status === "delivered"
+  const isDelivered = order.status === "delivered" || order.status === "done"
 
   return (
     <div
@@ -318,6 +318,7 @@ function MobileOrderRow({
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function DeliveryDashboard({
   onNavigateToMap,
+  onRegisterRefresh,
 }: {
   onNavigateToMap?: (
     firstOrder: Order,
@@ -325,8 +326,15 @@ export default function DeliveryDashboard({
     driverLocation: DriverLocation,
     slotGroups?: SlotGroup[]
   ) => void
+  onRegisterRefresh?: (refreshFn: () => Promise<void>) => void
 }) {
   const { orders = [], loading, error, refresh } = useOrders()
+
+  useEffect(() => {
+    if (onRegisterRefresh) {
+      onRegisterRefresh(refresh)
+    }
+  }, [refresh, onRegisterRefresh])
 
   const [selectedSlot, setSelectedSlot] = useState<string>("all")
   const [pincodeFilter, setPincodeFilter] = useState("")
@@ -387,7 +395,7 @@ export default function DeliveryDashboard({
   })
 
   const pendingCount   = sortedOrders.filter((o) => o.status === "pending").length
-  const deliveredCount = todayOrders.filter((o) => o.status === "delivered").length
+  const deliveredCount = todayOrders.filter((o) => o.status === "delivered" || o.status === "done").length
   const totalDistance  = sortedOrders
     .filter((o) => o.status === "pending")
     .reduce((s, o) => s + (o.distance ?? 0), 0)
@@ -600,13 +608,22 @@ export default function DeliveryDashboard({
         setShowDetailsModal(true)
       }
     }
+
     ;(async () => {
       try {
-        await fetch(`/api/orders/${orderId}`, {
+        const res = await fetch(`/api/orders/${orderId}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ status: "delivered" }),
         })
+
+        if (res.ok) {
+          setOptimizedOrders((prev) =>
+            prev.map((o) => (o.id === orderId ? { ...o, status: "delivered" } : o))
+          )
+        } else {
+          console.error("Failed to mark delivery delivered:", res.status, await res.text())
+        }
       } finally {
         refresh()
       }
