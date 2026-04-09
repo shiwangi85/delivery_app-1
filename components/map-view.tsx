@@ -9,6 +9,7 @@ import {
   ArrowUp, Crosshair, MapPin,
 } from "lucide-react"
 import mapboxgl from "mapbox-gl"
+// @ts-ignore
 import "mapbox-gl/dist/mapbox-gl.css"
 
 import ArrivalModal from "./arrival-modal"
@@ -17,6 +18,7 @@ import {
   slotColor, slotLabel, getRouteWithSteps,
 } from "./delivery-types"
 import type { MapViewProps, SlotGroup, Step } from "./delivery-types"
+import { supabase } from "@/lib/supabaseClient"
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? ""
@@ -490,18 +492,45 @@ function MapCanvas({
   }, [selectedOrder, setFollow])
 
   // ── Delivery confirmed (called by ArrivalModal) ───────────────────────────────
-  const handleDeliveryConfirmed = useCallback(() => {
+  const handleDeliveryConfirmed = useCallback(async () => {
     if (!currentStop) return
+
     setShowArrival(false)
+
+    // 🔥 UPDATE SUPABASE HERE
+    const { error } = await supabase
+      .from("orders")
+      .update({ status: "done" })
+      .eq("id", currentStop.id)
+
+    if (error) {
+      console.error("Failed to update order:", error)
+      alert("Failed to mark delivery as done")
+      return
+    }
+
+    // 🔊 Continue your existing logic
     speak("Delivery confirmed. Navigating to next stop.", voiceRef)
+
     onDeliveryComplete?.(currentStop.id)
+
     setStopIdx(s => s + 1)
     setEta(null); setRouteKm(null)
-    stepsRef.current = []; setSteps([])
-    stepIdxRef.current = 0; setCurrentStepI(0)
+
+    stepsRef.current = []
+    setSteps([])
+
+    stepIdxRef.current = 0
+    setCurrentStepI(0)
+
     setFollow(true)
     drawnRef.current = false
-    setTimeout(() => { const p = lastPosRef.current; if (p) drawRoute(p) }, 600)
+
+    setTimeout(() => {
+      const p = lastPosRef.current
+      if (p) drawRoute(p)
+    }, 600)
+
   }, [currentStop, onDeliveryComplete, drawRoute, setFollow])
 
   // ── Auto-reroute ──────────────────────────────────────────────────────────────
