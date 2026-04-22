@@ -39,7 +39,7 @@ export default function LiveTracking({ order, onStatusChange }: { order: any, on
           setDeliveryStatus(newStatus)
           onStatusChange?.(newStatus)
 
-          const messages = {
+          const messages: { [key: string]: string } = {
             "in-progress": "Delivery partner is on the way",
             nearby: "Delivery partner is nearby",
             delivered: "Order delivered successfully",
