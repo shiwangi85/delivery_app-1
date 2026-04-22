@@ -25,7 +25,7 @@ export default function DeliveryDetailsModal({ order, isOpen, onClose, onDeliver
     setIsDelivering(true)
     // Simulate delivery completion
     setTimeout(() => {
-      onDeliveryComplete()
+      onDeliveryComplete(order.id)
       setIsDelivering(false)
       setActiveTab("customer")
       setDeliveryNotes("")
@@ -37,7 +37,7 @@ export default function DeliveryDetailsModal({ order, isOpen, onClose, onDeliver
   const getOrderAge = () => {
     const date = new Date(order.created_at)
     const now = new Date()
-    const minutes = Math.floor((now - date) / 60000)
+    const minutes = Math.floor((now.getTime() - date.getTime()) / 60000)
     if (minutes < 1) return "Just now"
     if (minutes < 60) return `${minutes} minutes ago`
     const hours = Math.floor(minutes / 60)
@@ -261,7 +261,7 @@ export default function DeliveryDetailsModal({ order, isOpen, onClose, onDeliver
                       placeholder="Enter 4-digit OTP"
                       value={otp}
                       onChange={(e) => setOtp(e.target.value.slice(0, 4))}
-                      maxLength="4"
+                      maxLength={4}
                       className="border-slate-300"
                     />
                   )}
