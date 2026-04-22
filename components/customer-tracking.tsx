@@ -9,7 +9,7 @@ import { CheckCircle2, Clock, Navigation, AlertCircle, Search, Phone, MessageSqu
 
 export default function CustomerTracking() {
   const [trackingNumber, setTrackingNumber] = useState("")
-  const [trackedOrder, setTrackedOrder] = useState(null)
+  const [trackedOrder, setTrackedOrder] = useState<any>(null)
   const [isSearching, setIsSearching] = useState(false)
 
   // Mock orders database
