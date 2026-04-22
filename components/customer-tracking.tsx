@@ -13,7 +13,7 @@ export default function CustomerTracking() {
   const [isSearching, setIsSearching] = useState(false)
 
   // Mock orders database
-  const mockOrders = {
+const mockOrders: { [key: string]: any } = {
     "ORD-001": {
       order_number: "ORD-001",
       customer_name: "Rajesh Kumar",
@@ -120,7 +120,7 @@ export default function CustomerTracking() {
     }, 500)
   }
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
         return "bg-yellow-100 text-yellow-800 border-yellow-300"
@@ -135,7 +135,7 @@ export default function CustomerTracking() {
     }
   }
 
-  const getStatusIcon = (status) => {
+const getStatusIcon = (status: string) => {
     switch (status) {
       case "pending":
         return <Clock className="w-5 h-5" />
@@ -150,12 +150,12 @@ export default function CustomerTracking() {
     }
   }
 
-  const formatTime = (date) => {
+  const formatTime = (date: Date | null) => {
     if (!date) return ""
     return date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
   }
 
-  const formatDate = (date) => {
+const formatDate = (date: Date) => {
     return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
   }
 
