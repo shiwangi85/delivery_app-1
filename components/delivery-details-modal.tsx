@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { MapPin, Phone, Mail, MapIcon, CheckCircle, User, Package, AlertCircle, Camera } from "lucide-react"
 
-export default function DeliveryDetailsModal({ order, isOpen, onClose, onDeliveryComplete }) {
+export default function DeliveryDetailsModal({ order, isOpen, onClose, onDeliveryComplete }: { order: any, isOpen: boolean, onClose: () => void, onDeliveryComplete: (id: any) => void }) {
   const [activeTab, setActiveTab] = useState("customer")
   const [isDelivering, setIsDelivering] = useState(false)
   const [deliveryNotes, setDeliveryNotes] = useState("")
