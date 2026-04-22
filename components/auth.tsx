@@ -99,7 +99,8 @@ export default function AuthPage({ onAuthSuccess }: AuthPageProps) {
 
         // Insert into drivers table (include address fields)
         const { error: profileError } = await supabase
-          .from<Profile>("drivers")
+              .from<Profile, Profile>("drivers")
+          
           .insert([
             {
               id: data.user.id,
