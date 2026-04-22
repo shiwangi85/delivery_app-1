@@ -282,7 +282,7 @@ const formatDate = (date: Date) => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {trackedOrder.timeline.map((event, index) => (
+                  {trackedOrder.timeline.map((event: any, index: number) => (
                     <div key={index} className="flex gap-4">
                       {/* Timeline dot */}
                       <div className="flex flex-col items-center">
