@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Navigation, Clock, AlertCircle, CheckCircle2, Loader } from "lucide-react"
 
-export default function LiveTracking({ order, onStatusChange }) {
+export default function LiveTracking({ order, onStatusChange }: { order: any, onStatusChange: (status: any) => void }) {
   const [currentLocation, setCurrentLocation] = useState({ lat: 28.6139, lng: 77.209 })
   const [deliveryStatus, setDeliveryStatus] = useState(order?.status || "pending")
   const [isTracking, setIsTracking] = useState(false)
